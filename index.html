@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Name | Design Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Libraries are in the <head> to ensure they load before any scripts run -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/hover-effect@1.2.1/dist/hover-effect.umd.js"></script>
+
+    <style>
+      :root {
+        --background-color: #f4f4f4;
+        --text-color: #1a1a1a;
+        --text-muted-color: #555;
+        --overlay-bg: rgba(244, 244, 244, 0.95);
+        --aurora-1: #ffafbd;
+        --aurora-2: #c9ffbf;
+        --aurora-3: #a0c4ff;
+        --glass-bg: rgba(255, 255, 255, 0.5);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --gloss-color: rgba(255, 255, 255, 0.1);
+      }
+
+      [data-theme="dark"] {
+        --background-color: #1a1a1a;
+        --text-color: #f4f4f4;
+        --text-muted-color: #aaa;
+        --overlay-bg: rgba(26, 26, 26, 0.95);
+        --aurora-1: #a22c43;
+        --aurora-2: #2d6a4f;
+        --aurora-3: #1c3a69;
+        --glass-bg: rgba(30, 30, 30, 0.5);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --gloss-color: rgba(255, 255, 255, 0.05);
+      }
+
+      html.lenis {
+        height: auto;
+      }
+      .lenis.lenis-smooth {
+        scroll-behavior: auto;
+      }
+      .lenis.lenis-stopped {
+        overflow: hidden;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        overflow-x: hidden;
+        cursor: none;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        position: relative;
+      }
+
+      #aurora-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: -1;
+        opacity: 0.2;
+        overflow: hidden;
+        filter: blur(100px) brightness(1.2);
+      }
+      .aurora-blob {
+        position: absolute;
+        border-radius: 50%;
+        will-change: transform;
+        transition: background-color 0.3s ease;
+      }
+      #blob1 {
+        background: var(--aurora-1);
+        width: 400px;
+        height: 400px;
+        top: 10%;
+        left: 10%;
+      }
+      #blob2 {
+        background: var(--aurora-2);
+        width: 500px;
+        height: 500px;
+        top: 20%;
+        left: 60%;
+      }
+      #blob3 {
+        background: var(--aurora-3);
+        width: 300px;
+        height: 300px;
+        top: 70%;
+        left: 30%;
+      }
+
+      .cursor {
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        width: 40px;
+        height: 40px;
+        transition: opacity 0.3s ease;
+      }
+      .cursor-outline {
+        width: 100%;
+        height: 100%;
+        border: 1px solid var(--text-color);
+        border-radius: 50%;
+        transition: transform 0.2s ease-out, background-color 0.3s ease;
+      }
+      .cursor-dot {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 8px;
+        height: 8px;
+        background-color: var(--text-color);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .cursor-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        color: var(--background-color);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .cursor-grow .cursor-outline {
+        transform: scale(1.5);
+        background-color: var(--text-color);
+      }
+      .cursor-view .cursor-outline {
+        transform: scale(2);
+        background-color: var(--text-color);
+        border-color: transparent;
+      }
+      .cursor-view .cursor-text {
+        opacity: 1;
+      }
+
+      .preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--background-color);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.8s ease, visibility 0.8s ease;
+      }
+      .preloader.loaded {
+        opacity: 0;
+        visibility: hidden;
+      }
+      #preloader-counter {
+        font-family: "Playfair Display", serif;
+        font-size: 2rem;
+      }
+
+      h1,
+      h2,
+      h3,
+      .nav-item {
+        font-family: "Playfair Display", serif;
+      }
+
+      .page-content,
+      .nav-item {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      .glass-card {
+        position: relative;
+        background-color: var(--glass-bg);
+        backdrop-filter: blur(12px) saturate(150%);
+        -webkit-backdrop-filter: blur(12px) saturate(150%);
+        border-radius: 1rem;
+        border: 1px solid var(--glass-border);
+        padding: 3rem 4rem;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease, border 0.3s ease,
+          transform 0.2s ease-out;
+        will-change: transform;
+        overflow: hidden;
+      }
+      .gloss-effect {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 150%;
+        height: 150%;
+        background: radial-gradient(
+          circle at center,
+          var(--gloss-color) 0%,
+          transparent 40%
+        );
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .glass-card:hover .gloss-effect {
+        opacity: 1;
+      }
+      #view-work-btn {
+        border-color: var(--text-color);
+        transition: background-color 0.3s ease, color 0.3s ease,
+          border-color 0.3s ease;
+      }
+      #view-work-btn:hover {
+        background-color: var(--text-color);
+        color: var(--background-color);
+      }
+
+      /* Project List Section */
+      #work-section {
+        border-top: 1px solid var(--text-muted-color);
+      }
+      .project-item-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 3rem 0;
+        border-bottom: 1px solid var(--text-muted-color);
+        transition: opacity 0.3s ease;
+      }
+      #work-section:hover .project-item-link:not(:hover) {
+        opacity: 0.5;
+      }
+      .project-item-title {
+        font-size: 3rem;
+        font-family: "Playfair Display", serif;
+      }
+      .project-item-category {
+        font-size: 1rem;
+        color: var(--text-muted-color);
+      }
+
+      #project-hover-preview {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 200px;
+        height: 200px;
+        pointer-events: none;
+        z-index: 50;
+        overflow: hidden;
+        border-radius: 50%;
+        opacity: 0;
+        scale: 0.8;
+        will-change: transform;
+      }
+      #project-hover-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--overlay-bg);
+        backdrop-filter: blur(10px);
+        z-index: 50;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+        overflow-y: auto; /* Ensure overlay is scrollable */
+      }
+      .overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      .overlay-content {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+        padding-top: 6rem; /* Add padding for spacing */
+        padding-bottom: 6rem; /* Add padding for spacing */
+      }
+      .overlay.active .overlay-content {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .project-detail-view {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--background-color);
+        z-index: 60;
+        pointer-events: none;
+        opacity: 0;
+      }
+      .project-detail-view.active {
+        pointer-events: auto;
+        opacity: 1;
+      }
+      #project-detail-image-wrapper {
+        position: absolute;
+        overflow: hidden;
+      }
+      #project-detail-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .project-detail-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 2rem;
+        color: #fff;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+        opacity: 0;
+      }
+
+      .theme-switch {
+        width: 40px;
+        height: 20px;
+        background: var(--text-muted-color);
+        border-radius: 10px;
+        position: relative;
+      }
+      .theme-switch-handle {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        background: var(--background-color);
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+      }
+      [data-theme="dark"] .theme-switch-handle {
+        transform: translateX(20px);
+      }
+
+      [data-magnetic] {
+        transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .marquee {
+        overflow: hidden;
+        white-space: nowrap;
+        padding: 2rem 0;
+        border-top: 1px solid var(--text-muted-color);
+        border-bottom: 1px solid var(--text-muted-color);
+      }
+      .marquee-content {
+        display: inline-block;
+        animation: marquee 30s linear infinite;
+      }
+      .marquee-item {
+        display: inline-block;
+        font-size: 3rem;
+        font-family: "Playfair Display", serif;
+        padding: 0 2rem;
+      }
+      @keyframes marquee {
+        from {
+          transform: translateX(0%);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+    </style>
+  </head>
+  <body class="antialiased">
+    <div id="aurora-container">
+      <div id="blob1" class="aurora-blob"></div>
+      <div id="blob2" class="aurora-blob"></div>
+      <div id="blob3" class="aurora-blob"></div>
+    </div>
+
+    <div class="cursor">
+      <div class="cursor-outline">
+        <div class="cursor-text">View</div>
+      </div>
+      <div class="cursor-dot"></div>
+    </div>
+
+    <div id="project-hover-preview"><img src="" alt="Project Preview" /></div>
+
+    <div class="preloader"><div id="preloader-counter">0%</div></div>
+
+    <header class="fixed top-0 left-0 w-full z-40 p-4 sm:p-8">
+      <nav class="flex justify-between items-center max-w-7xl mx-auto">
+        <a
+          href="#"
+          class="nav-item text-2xl font-bold tracking-wider"
+          data-target="home"
+          data-magnetic
+          >Aryansh Singh</a
+        >
+        <div class="flex items-center space-x-6 sm:space-x-10 text-lg">
+          <a href="#" class="nav-item" data-target="about" data-magnetic
+            >About</a
+          >
+          <a href="#" class="nav-item" data-target="contact" data-magnetic
+            >Contact</a
+          >
+          <button class="nav-item theme-switch" id="theme-toggle" data-magnetic>
+            <div class="theme-switch-handle"></div>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main-content" class="page-content py-32 px-4 sm:px-8">
+      <div class="max-w-7xl mx-auto">
+        <section
+          id="hero-section"
+          class="mb-24 h-[60vh] flex items-center justify-center text-center"
+          style="perspective: 1000px"
+        >
+          <div class="glass-card">
+            <div class="gloss-effect"></div>
+            <h1
+              id="main-title"
+              class="text-4xl sm:text-5xl md:text-6xl leading-tight max-w-4xl mx-auto"
+            >
+              The last line of code is the first stroke of the experience.
+            </h1>
+            <div class="mt-8">
+              <button
+                id="view-work-btn"
+                class="border px-6 py-3 rounded-full text-lg"
+                data-magnetic
+              >
+                View My Work
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="text-center mb-16">
+          <h2 id="work-title" class="text-5xl font-medium">The Artifacts</h2>
+        </div>
+
+        <!-- New Project List Section -->
+        <section id="work-section">
+          <!-- Projects will be dynamically inserted here -->
+        </section>
+      </div>
+    </main>
+
+    <footer id="footer" class="opacity-0 mt-20">
+      <div class="marquee">
+        <div class="marquee-content">
+          <span class="marquee-item">Let's Talk</span
+          ><span class="marquee-item">&bull;</span>
+          <span class="marquee-item">Have a project?</span
+          ><span class="marquee-item">&bull;</span>
+          <span class="marquee-item">Let's Talk</span
+          ><span class="marquee-item">&bull;</span>
+          <span class="marquee-item">Have a project?</span
+          ><span class="marquee-item">&bull;</span>
+        </div>
+      </div>
+      <div
+        class="py-8 px-4 sm:px-8 text-center"
+        style="color: var(--text-muted-color)"
+      >
+        Aryansh Singh &copy; 2025
+      </div>
+    </footer>
+
+    <div id="about-overlay" class="overlay">
+      <div class="overlay-content max-w-4xl mx-auto p-8 sm:p-16">
+        <h2 class="text-4xl sm:text-6xl mb-8">About Me</h2>
+        <div
+          class="text-lg sm:text-xl space-y-6 leading-relaxed"
+          style="color: var(--text-muted-color)"
+        >
+          <p>
+            Hello! I’m Aryansh. At my core, I’m a builder. I get a real kick out
+            of taking complex, powerful technologies and shaping them into tools
+            that feel intuitive and, dare I say, a little bit magical. For me,
+            it’s not just about writing code that works; it's about crafting an
+            experience that feels intelligent and seamless from the first click.
+          </p>
+          <p>
+            My playground is usually at the intersection of AI and full-stack
+            development. I’ve built everything from self-healing AI agents that
+            learn from their own mistakes to coding assistants that help
+            developers untangle tricky bugs in plain English. I love getting my
+            hands dirty with the entire process—from designing the system
+            architecture with FastAPI and Docker to building a clean, responsive
+            interface with React.
+          </p>
+          <p>
+            While I love the logic of a well-built backend, I'm equally
+            passionate about how that system is presented to the world. I
+            believe the best tools are the ones that don't just function
+            perfectly but also look and feel exceptional. That's why I built
+            this portfolio from scratch—to have a space that truly reflects my
+            appreciation for both deep engineering and thoughtful design.
+          </p>
+          <p>
+            When I’m not building new tech, you can usually find me working on
+            community projects, like my recent work helping voiceless animals.
+            It's a humbling reminder that the skills we build are most valuable
+            when they serve others.
+          </p>
+          <p>
+            If you're building something ambitious or just want to chat about
+            the future of AI, I'd love to connect.
+          </p>
+          <p class="mt-8">
+            <a
+              href="./Aryansh.pdf"
+              class="border-b"
+              style="border-color: var(--text-color)"
+              >View My Resume</a
+            >
+          </p>
+        </div>
+        <button
+          class="close-btn absolute top-8 right-8 text-2xl font-bold"
+          data-target="about"
+        >
+          &times;
+        </button>
+      </div>
+    </div>
+
+    <div id="contact-overlay" class="overlay">
+      <div class="overlay-content max-w-4xl mx-auto p-8 sm:p-16">
+        <h2 class="text-4xl sm:text-6xl mb-8">Let's Connect</h2>
+        <div
+          class="text-lg sm:text-xl space-y-6 leading-relaxed"
+          style="color: var(--text-muted-color)"
+        >
+          <p>
+            I'm currently seeking internship opportunities where I can apply my
+            creativity and learn from an experienced design team. If you think
+            I'd be a good fit, I'd love to hear from you.
+          </p>
+          <div class="space-y-4">
+            <p>
+              <strong class="font-medium" style="color: var(--text-color)"
+                >Email:</strong
+              >
+              <a
+                href="mailto:aryanshsingh925@gmail.com"
+                class="border-b"
+                style="border-color: var(--text-color)"
+                >aryanshsingh925@gmail.com</a
+              >
+            </p>
+            <p>
+              <strong class="font-medium" style="color: var(--text-color)"
+                >LinkedIn:</strong
+              >
+              <a
+                href="https://linkedin.com/in/aryanshsingh2020"
+                target="_blank"
+                class="border-b"
+                style="border-color: var(--text-color)"
+                >linkedin.com/in/aryanshsingh2020</a
+              >
+            </p>
+            <p>
+              <strong class="font-medium" style="color: var(--text-color)"
+                >GitHub:</strong
+              >
+              <a
+                href="https://github.com/aryanshsingh2020"
+                target="_blank"
+                class="border-b"
+                style="border-color: var(--text-color)"
+                >github.com/aryanshsingh2020</a
+              >
+            </p>
+          </div>
+        </div>
+        <button
+          class="close-btn absolute top-8 right-8 text-2xl font-bold"
+          data-target="contact"
+        >
+          &times;
+        </button>
+      </div>
+    </div>
+
+    <div id="project-detail-view" class="project-detail-view">
+      <button
+        id="close-project-btn"
+        class="fixed top-8 right-8 z-50 text-white text-4xl mix-blend-difference"
+      >
+        &times;
+      </button>
+      <div id="project-detail-image-wrapper">
+        <img id="project-detail-image" src="" alt="Project Detail Image" />
+      </div>
+      <div class="project-detail-content">
+        <h2 id="project-detail-title" class="text-4xl mb-2"></h2>
+        <p id="project-detail-category" class="text-xl"></p>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const projectsData = [
+          {
+            title: "Self-Healing AI Agent",
+            category: "AI & Backend Development",
+            image1: "./img1.png",
+          },
+          {
+            title: "CodeWhisper: AI Coding Assistant",
+            category: "Full-Stack & AI Integration",
+            image1: "./img3.png",
+          },
+          {
+            title: "Natural Language Data Query",
+            category: "Full-Stack & RAG",
+            image1: "./img2.png",
+          },
+        ];
+
+        function createProjectElements() {
+          const workSection = document.getElementById("work-section");
+          if (!workSection) return;
+          workSection.innerHTML = "";
+          projectsData.forEach((project, index) => {
+            const projectEl = document.createElement("a");
+            projectEl.href = "#";
+            projectEl.className = "project-item-link";
+            projectEl.dataset.index = index;
+            projectEl.innerHTML = `
+                    <span class="project-item-title">${project.title}</span>
+                    <span class="project-item-category">${project.category}</span>
+                `;
+            workSection.appendChild(projectEl);
+          });
+        }
+
+        function initBase() {
+          createProjectElements();
+          gsap.registerPlugin(ScrollTrigger);
+          const lenis = new Lenis();
+
+          lenis.on("scroll", ScrollTrigger.update);
+          gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+          });
+          gsap.ticker.lagSmoothing(0);
+
+          return { lenis };
+        }
+
+        function initCursor() {
+          const cursor = document.querySelector(".cursor");
+          const links = document.querySelectorAll("a, button, [data-magnetic]");
+
+          gsap.set(cursor, { xPercent: -50, yPercent: -50 });
+
+          window.addEventListener("mousemove", (e) => {
+            gsap.to(cursor, {
+              duration: 0.7,
+              x: e.clientX,
+              y: e.clientY,
+              ease: "power3.out",
+            });
+          });
+
+          links.forEach((link) => {
+            link.addEventListener("mouseenter", () =>
+              cursor.classList.add("cursor-grow")
+            );
+            link.addEventListener("mouseleave", () =>
+              cursor.classList.remove("cursor-grow")
+            );
+          });
+        }
+
+        function initAuroraEffect() {
+          const blobs = gsap.utils.toArray(".aurora-blob");
+          window.addEventListener("mousemove", (e) => {
+            const { clientX, clientY } = e;
+            const x = clientX / window.innerWidth - 0.5;
+            const y = clientY / window.innerHeight - 0.5;
+
+            blobs.forEach((blob, i) => {
+              gsap.to(blob, {
+                duration: 2,
+                x: x * (150 * (i + 1)),
+                y: y * (150 * (i + 1)),
+                ease: "power2.out",
+              });
+            });
+          });
+        }
+
+        function initGlassCardEffect() {
+          const hero = document.getElementById("hero-section");
+          const card = hero.querySelector(".glass-card");
+          const gloss = card.querySelector(".gloss-effect");
+
+          hero.addEventListener("mousemove", (e) => {
+            const { clientX, clientY } = e;
+            const { top, left, width, height } = hero.getBoundingClientRect();
+            const x = (clientX - (left + width / 2)) / (width / 2);
+            const y = (clientY - (top + height / 2)) / (height / 2);
+
+            gsap.to(card, {
+              duration: 1,
+              rotationY: x * 10,
+              rotationX: -y * 10,
+              ease: "power2.out",
+            });
+            gsap.to(gloss, {
+              duration: 1,
+              x: clientX - left,
+              y: clientY - top,
+              ease: "power2.out",
+            });
+          });
+
+          hero.addEventListener("mouseleave", () => {
+            gsap.to(card, {
+              duration: 1,
+              rotationY: 0,
+              rotationX: 0,
+              ease: "elastic.out(1, 0.5)",
+            });
+          });
+        }
+
+        function initThemeToggle() {
+          const themeToggle = document.getElementById("theme-toggle");
+          const htmlEl = document.documentElement;
+          const savedTheme = localStorage.getItem("theme") || "light";
+          htmlEl.setAttribute("data-theme", savedTheme);
+          themeToggle.addEventListener("click", () => {
+            const newTheme =
+              htmlEl.getAttribute("data-theme") === "dark" ? "light" : "dark";
+            htmlEl.setAttribute("data-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+          });
+        }
+
+        function initAnimations() {
+          function setupWordReveal(selector) {
+            document.querySelectorAll(selector).forEach((title) => {
+              if (title.children.length > 0) return;
+              const words = title.innerText.split(" ");
+              title.innerHTML = words
+                .map(
+                  (word) =>
+                    `<span class="reveal-word"><span class="reveal-word-inner">${word}</span></span>`
+                )
+                .join(" ");
+            });
+          }
+
+          setupWordReveal("#main-title");
+          setupWordReveal("#work-title");
+
+          const tl = gsap.timeline({
+            defaults: { ease: "power3.out", duration: 1.2 },
+          });
+          tl.to(".nav-item", { opacity: 1, y: 0, stagger: 0.1, delay: 0.5 })
+            .to(".page-content", { opacity: 1, y: 0 }, "-=1.2")
+            .to(
+              "#main-title .reveal-word-inner",
+              { y: 0, stagger: 0.05 },
+              "-=1.4"
+            )
+            .fromTo(
+              "#work-section",
+              { autoAlpha: 0, y: 50 },
+              { autoAlpha: 1, y: 0 },
+              "-=1"
+            );
+
+          gsap.from("#work-title", {
+            scrollTrigger: {
+              trigger: "#work-title",
+              start: "top 85%",
+            },
+            onComplete: () => {
+              gsap.to("#work-title .reveal-word-inner", {
+                y: 0,
+                stagger: 0.05,
+              });
+            },
+          });
+
+          gsap.to("#footer", {
+            autoAlpha: 1,
+            scrollTrigger: { trigger: "#work-section", start: "bottom 90%" },
+          });
+        }
+
+        function initProjectHoverList() {
+          const preview = document.getElementById("project-hover-preview");
+          const previewImg = preview.querySelector("img");
+          const links = document.querySelectorAll(".project-item-link");
+
+          gsap.set(preview, { xPercent: -50, yPercent: -50 });
+
+          links.forEach((link) => {
+            link.addEventListener("mouseenter", () => {
+              const index = parseInt(link.dataset.index);
+              previewImg.src = projectsData[index].image1;
+              gsap.to(preview, {
+                duration: 0.3,
+                autoAlpha: 1,
+                scale: 1,
+                ease: "power2.out",
+              });
+            });
+            link.addEventListener("mouseleave", () => {
+              gsap.to(preview, {
+                duration: 0.3,
+                autoAlpha: 0,
+                scale: 0.8,
+                ease: "power2.out",
+              });
+            });
+          });
+
+          window.addEventListener("mousemove", (e) => {
+            gsap.to(preview, {
+              duration: 0.7,
+              x: e.clientX,
+              y: e.clientY,
+              ease: "power3.out",
+            });
+          });
+        }
+
+        function initScrollToWork(lenis) {
+          const viewWorkBtn = document.getElementById("view-work-btn");
+          if (!viewWorkBtn) return;
+
+          viewWorkBtn.addEventListener("click", () => {
+            lenis.scrollTo("#work-title", {
+              offset: -100,
+              duration: 2,
+              easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            });
+          });
+        }
+
+        function initMagneticElements() {
+          document.querySelectorAll("[data-magnetic]").forEach((el) => {
+            el.addEventListener("mousemove", function (e) {
+              const { clientX, clientY } = e;
+              const { left, top, width, height } = this.getBoundingClientRect();
+              const x = (clientX - (left + width / 2)) * 0.4;
+              const y = (clientY - (top + height / 2)) * 0.4;
+              gsap.to(this, {
+                x: x,
+                y: y,
+                duration: 0.8,
+                ease: "elastic.out(1, 0.5)",
+              });
+            });
+            el.addEventListener("mouseleave", function () {
+              gsap.to(this, {
+                x: 0,
+                y: 0,
+                duration: 0.8,
+                ease: "elastic.out(1, 0.5)",
+              });
+            });
+          });
+        }
+
+        function initOverlays(lenis) {
+          const mainContent = document.getElementById("main-content");
+          const header = document.querySelector("header");
+
+          document.querySelectorAll("[data-target]").forEach((trigger) => {
+            trigger.addEventListener("click", (e) => {
+              e.preventDefault();
+              const targetId = trigger.dataset.target;
+              if (targetId === "home") {
+                document
+                  .querySelectorAll(".overlay.active")
+                  .forEach((o) => closeOverlay(o.id.split("-")[0]));
+              } else if (document.getElementById(`${targetId}-overlay`)) {
+                openOverlay(targetId);
+              }
+            });
+          });
+
+          document.querySelectorAll(".close-btn").forEach((btn) => {
+            btn.addEventListener(
+              "click",
+              (e) => e.preventDefault() || closeOverlay(btn.dataset.target)
+            );
+          });
+
+          function openOverlay(id) {
+            lenis.stop();
+            document.getElementById(`${id}-overlay`).classList.add("active");
+            gsap.to([mainContent, header, document.getElementById("footer")], {
+              duration: 0.5,
+              filter: "blur(10px)",
+              scale: 0.98,
+              ease: "power3.out",
+            });
+          }
+
+          function closeOverlay(id) {
+            lenis.start();
+            document.getElementById(`${id}-overlay`).classList.remove("active");
+            gsap.to([mainContent, header, document.getElementById("footer")], {
+              duration: 0.5,
+              filter: "blur(0px)",
+              scale: 1,
+              ease: "power3.out",
+            });
+          }
+        }
+
+        function initProjectTransitions(lenis) {
+          const detailView = document.getElementById("project-detail-view");
+          const imageWrapper = document.getElementById(
+            "project-detail-image-wrapper"
+          );
+          const detailImage = document.getElementById("project-detail-image");
+          const detailTitle = document.getElementById("project-detail-title");
+          const detailCategory = document.getElementById(
+            "project-detail-category"
+          );
+          const detailContent = detailView.querySelector(
+            ".project-detail-content"
+          );
+
+          document.querySelectorAll(".project-item-link").forEach((item) => {
+            item.addEventListener("click", (e) => {
+              e.preventDefault();
+              const index = parseInt(item.dataset.index);
+              const project = projectsData[index];
+              const rect = document
+                .getElementById("project-hover-preview")
+                .getBoundingClientRect();
+
+              detailImage.src = project.image1;
+              detailTitle.innerText = project.title;
+              detailCategory.innerText = project.category;
+
+              lenis.stop();
+              detailView.classList.add("active");
+
+              gsap.set(imageWrapper, {
+                top: rect.top,
+                left: rect.left,
+                width: rect.width,
+                height: rect.height,
+                borderRadius: "50%",
+              });
+              gsap.set(detailImage, { yPercent: 100 });
+
+              const tl = gsap.timeline();
+              tl.to(imageWrapper, {
+                duration: 1.2,
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                borderRadius: "0%",
+                ease: "expo.inOut",
+              })
+                .to(
+                  detailImage,
+                  {
+                    yPercent: 0,
+                    duration: 1.2,
+                    ease: "expo.inOut",
+                  },
+                  0
+                )
+                .to(detailContent, { opacity: 1, duration: 0.5 }, ">-0.5");
+            });
+          });
+
+          document
+            .getElementById("close-project-btn")
+            .addEventListener("click", () => {
+              gsap.to(detailContent, { opacity: 0, duration: 0.3 });
+              gsap.to(detailView, {
+                opacity: 0,
+                duration: 0.5,
+                delay: 0.1,
+                onComplete: () => {
+                  detailView.classList.remove("active");
+                  gsap.set(detailView, { clearProps: "all" });
+                  gsap.set(imageWrapper, { clearProps: "all" });
+                  gsap.set(detailImage, { clearProps: "all" });
+                  lenis.start();
+                },
+              });
+            });
+        }
+
+        function run() {
+          const { lenis } = initBase();
+          initCursor();
+          initThemeToggle();
+          initAuroraEffect();
+          initGlassCardEffect();
+          initScrollToWork(lenis);
+
+          const preloader = document.querySelector(".preloader");
+          const counter = document.getElementById("preloader-counter");
+          let progress = 0;
+          const interval = setInterval(() => {
+            progress += Math.floor(Math.random() * 2) + 1; // Slower progress
+            if (progress >= 100) {
+              progress = 100;
+              clearInterval(interval);
+              preloader.classList.add("loaded");
+
+              initAnimations();
+              initProjectHoverList();
+              initMagneticElements();
+              initOverlays(lenis);
+              initProjectTransitions(lenis);
+            }
+            counter.innerText = `${progress}%`;
+          }, 80); // Slower interval
+        }
+
+        run();
+      });
+    </script>
+  </body>
+</html>
